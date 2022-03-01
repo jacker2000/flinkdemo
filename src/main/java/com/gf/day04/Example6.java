@@ -80,6 +80,8 @@ public class Example6 {
                                 )
                         );
                         //销毁窗口
+                        //.remove只清除windowStartTime对应的键值对
+                        //.clear 将整个mapState清空
                         mapState.remove(windowStartTime);
                     }
                 })

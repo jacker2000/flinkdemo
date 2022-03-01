@@ -2,9 +2,9 @@ package com.gf.utils;
 
 public class SensorReading {
     public String sensorId;
-    public Integer temperature;
+    public Double temperature;
 
-    public SensorReading(String sensorId, Integer temperature) {
+    public SensorReading(String sensorId, Double temperature) {
         this.sensorId = sensorId;
         this.temperature = temperature;
     }
