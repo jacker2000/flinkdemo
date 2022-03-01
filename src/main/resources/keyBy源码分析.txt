@@ -1,0 +1,88 @@
+总结：
+    保证key相同的一定进入到一个分区内，但是一个分区内可以有多key的数据；
+    是对数据进行实时的分区，不是上游发送给下游，而是将数据写入到对应的channel的缓存中，下游到上游实时拉取；
+    keyBy底层是new KeyedStream，然后将父DataStream包起来，并且传入keyBy的条件（keySelector）；
+    最终会调用KeyGroupStreamPartitioner的selectChannel方法，将keyBy的条件的返回值传入到该方法中；
+
+KeyGroupRangeAssignment(源码)
+
+// 将key的HashCode值进行特殊的hash处理，MathUtils.murmurHash(keyHash)，一定返回正数，避免返回的数字为负
+    public static int computeKeyGroupForKeyHash(int keyHash, int maxParallelism) {
+            return MathUtils.murmurHash(keyHash) % maxParallelism;
+        }
+// keyGroupId * parallelism（程序的并行度） / maxParallelism（默认最大并行），返回分区编号
+    public static int computeKeyGroupForKeyHash(int keyHash, int maxParallelism) {
+            return MathUtils.murmurHash(keyHash) % maxParallelism;
+        }
+流程：
+
+    1.先计算key的HashCode值（有可能会是负的）
+    2将key的HashCode值进行特殊的hash处理，MathUtils.murmurHash(keyHash)，一定返回正数，避免返回的数字为负
+    3.将返回特特殊的hash值模除以默认最大并行的，默认是128，得到keyGroupId
+    4.keyGroupId * parallelism（程序的并行度） / maxParallelism（默认最大并行），返回分区编号
+    注意：
+        1.如果将自定义POJO当成key，必须重新hashcode方法，
+        2.不能将数组当成keyBy的key
+
+env.execute()--> // execute：执行
+
+    public JobExecutionResult execute(String jobName) throws Exception {
+    		// getStreamGraph：获取StreamGraph
+    		return execute(getStreamGraph(jobName));
+    	} ---->
+
+    	@Internal
+        	public StreamGraph getStreamGraph(String jobName) {
+        		// generate：生成StreamGraph
+        		return getStreamGraphGenerator().setJobName(jobName).generate();
+        	} ---->
+
+        	public StreamGraph generate() {
+            		streamGraph = new StreamGraph(executionConfig);
+            		streamGraph.setStateBackend(stateBackend);
+            		streamGraph.setChaining(chaining);
+            		streamGraph.setScheduleMode(scheduleMode);
+            		streamGraph.setTimeCharacteristic(timeCharacteristic);
+            		streamGraph.setJobName(jobName);
+            		streamGraph.setGlobalDataExchangeMode(globalDataExchangeMode);
+
+            		alreadyTransformed = new HashMap<>();
+
+            		for (Transformation<?> transformation: transformations) {
+            			transform(transformation);
+            		}
+
+            		final StreamGraph builtStreamGraph = streamGraph;
+
+            		alreadyTransformed.clear();
+            		alreadyTransformed = null;
+            		streamGraph = null;
+
+            		return builtStreamGraph;
+            	} ---->
+            	    //StreamGraph 是java类
+            	    @Internal
+                    public class StreamGraph implements Pipeline {
+                        //图数据结构: 顶点(节点)和边构成
+
+相同并行度且没有shuffle合成一个任务链
+将并行度一样且one-to-one的算子优化成任务链
+每个顶点占一个线程(底层用线程池的编程模型)
+每个顶点对应一个Task,每个Task运行在线程上面
+
+CompletableFuture:
+    1.异步IO,事件驱动(底层 线程池，多路复用IO)-->JUC
+aka:
+    scala实现java的一个通讯组件(actor设计模式)
+基本数据结构与算法：
+    堆排序
+    快排序
+设计模式:
+GOC
+线程池
+异步IO--->go语言
+
+网络IO:Tcp/ip
+内存管理：堆内、堆外
+排序：树形结构
+
