@@ -2,6 +2,8 @@ package com.gf.test.day04;
 
 import com.gf.utils.SensorReading;
 import com.gf.utils.SensorSource;
+import org.apache.flink.api.common.state.ListState;
+import org.apache.flink.api.common.state.ListStateDescriptor;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.Types;
@@ -9,6 +11,8 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
+
+import java.util.Iterator;
 
 //连续1秒钟温度上升的持续时间是多少
 public class Example3 {
@@ -24,6 +28,9 @@ public class Example3 {
                     private ValueState<Long> timerTs; //定时器
 
                     private ValueState<Long> durationTs; //持续时间
+
+                    private ListState<Double> timerList; //
+
                     @Override
                     public void open(Configuration parameters) throws Exception {
                         super.open(parameters);
@@ -39,6 +46,10 @@ public class Example3 {
                         durationTs= getRuntimeContext().getState(
                                 new ValueStateDescriptor<Long>("duration-Ts",
                                         Types.LONG)
+                        );
+                        timerList =getRuntimeContext().getListState(
+                                new ListStateDescriptor<Double>("list-timerList",
+                                        Types.DOUBLE)
                         );
                     }
                     @Override
@@ -64,13 +75,14 @@ public class Example3 {
                                 timerTs.update(oneSecondLater);
 
                                 durationTs.update(ctx.timerService().currentProcessingTime()-durationTs.value());
-
+                                timerList.add(value.temperature);
 
                             }//1.温度下降2.存在报警定时器
                             else if(value.temperature<tmp&& timerTs.value()!=null){
                                 ctx.timerService().deleteProcessingTimeTimer(timerTs.value());
                                 timerTs.clear();
                                 durationTs.clear();
+                                timerList.clear();
                             }
                         }
                     }
@@ -78,9 +90,19 @@ public class Example3 {
                     @Override
                     public void onTimer(long timestamp, OnTimerContext ctx, Collector<String> out) throws Exception {
                         super.onTimer(timestamp, ctx, out);
-                        out.collect("传感器" + ctx.getCurrentKey() + "连续1秒钟温度上升的持续时间:"+durationTs.value()+"毫秒");
+                        StringBuilder str=new StringBuilder();
+                        Iterator<Double> temperatureList = timerList.get().iterator();
+                        while (temperatureList.hasNext()){
+                            str.append(temperatureList.next()+",");
+                        }
+                        String resultStr = str.toString();
+                        String result = resultStr.substring(0, resultStr.length() - 1);
+
+                        out.collect("传感器" + ctx.getCurrentKey() + "连续1秒钟温度上升的持续时间:"+durationTs.value()+"毫秒"
+                        +"温度值列表为:"+result);
                         timerTs.clear();
                         durationTs.clear();
+                        timerList.clear();
                     }
                 })
                 .print();

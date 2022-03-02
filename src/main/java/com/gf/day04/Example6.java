@@ -25,7 +25,7 @@ public class Example6 {
                 .process(new KeyedProcessFunction<String, ClickEvent, UrlViewCountPerWindow>() {
 
                     //key：windowStartTime
-                    //value:url在窗口中浏览次数,也就是累加器
+                    //value:url在windowStartTime对应窗口中浏览次数,也就是累加器
                     private MapState<Long,Long> mapState;
 
                     //滚动窗口长度
