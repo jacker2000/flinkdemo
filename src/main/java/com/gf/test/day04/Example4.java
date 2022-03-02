@@ -1,6 +1,5 @@
 package com.gf.test.day04;
 
-import com.gf.day04.Example5;
 import com.gf.utils.ClickEvent;
 import com.gf.utils.ClickSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -11,7 +10,6 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Example4 {
