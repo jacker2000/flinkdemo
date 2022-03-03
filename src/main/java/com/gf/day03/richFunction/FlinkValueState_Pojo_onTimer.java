@@ -96,6 +96,8 @@ public class FlinkValueState_Pojo_onTimer {
                             );
                             accmulator.update(newAcc);
                         }
+                        //todo 注意:accmulator需要维护历史IntegerStatistic数据，不清空
+
                         //第一条数据到来时，timerTs为空
                         //onTimer执行之后，timerTs为空
                         if (timerTs.value()==null) {

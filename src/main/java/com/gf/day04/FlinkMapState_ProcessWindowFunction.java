@@ -60,6 +60,7 @@ public class FlinkMapState_ProcessWindowFunction {
                         ctx.timerService().registerProcessingTimeTimer(windowEndTime-1L);
 
                     }
+                    //onTimer 相当于processWindow里面的process函数
                     @Override
                     public void onTimer(long timestamp, OnTimerContext ctx, Collector<UrlViewCountPerWindow> out) throws Exception {
                         super.onTimer(timestamp, ctx, out);

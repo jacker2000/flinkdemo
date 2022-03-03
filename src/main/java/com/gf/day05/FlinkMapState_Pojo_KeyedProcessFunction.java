@@ -65,6 +65,7 @@ public class FlinkMapState_Pojo_KeyedProcessFunction {
                         ctx.timerService().registerProcessingTimeTimer(windowEndTime-1);
                     }
 
+                    //onTimer 相当于processWindow里面的process函数
                     @Override
                     public void onTimer(long timestamp, OnTimerContext ctx, Collector<UrlViewCountPerWindow> out) throws Exception {
                         super.onTimer(timestamp, ctx, out);
@@ -82,6 +83,7 @@ public class FlinkMapState_Pojo_KeyedProcessFunction {
                                 windowStartTimes,
                                 windowEndTime
                         ));
+                        mapState.remove(windowStartTimes);
                     }
                 })
                 .print();

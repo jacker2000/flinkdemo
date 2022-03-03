@@ -1,6 +1,6 @@
 package com.gf.day03.richFunction;
 
-public class Example11 {
+public class JavaOverload {
     public static void main(String[] args) {
         //运算符重载
         add(1,2);

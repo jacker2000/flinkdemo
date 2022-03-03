@@ -40,6 +40,11 @@ public class FlinkEventTimeSessionWindows {
                     }
                 })
                 .keyBy(r->1)
+                /*
+                    todo:
+                        事件会话窗口大小是根据: 窗口大小+发送事件戳决定，
+                        当第一个会话窗口关闭后，第二个窗口会积攒会话数据等第二次同步process，直到全部处理结束
+                 */
                 .window(EventTimeSessionWindows.withGap(Time.seconds(5)))
                 .process(new ProcessWindowFunction<Integer, String, Integer, TimeWindow>() {
                     @Override

@@ -61,6 +61,7 @@ public class FlinkMapState_KeyedProcessFunction {
                         for (String url : mapState.keys()) {
                             map.put(url,mapState.get(url));
                         }
+                        //todo mapState没有被清空，导致mapState会越来越大，导致OOM
                         String mapJson = JSON.toJSONString(map);
                         result.append(ctx.getCurrentKey()+"\n").append(mapJson);
 

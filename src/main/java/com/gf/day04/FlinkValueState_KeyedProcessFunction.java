@@ -100,6 +100,7 @@ public class FlinkValueState_KeyedProcessFunction {
             out.collect("传感器:"+ctx.getCurrentKey()+"连续1s温度上升!");
             //清空保存报警定时器时间戳的状态变量
             timerTs.clear();
+            lastTemp.clear();
         }
     }
 }

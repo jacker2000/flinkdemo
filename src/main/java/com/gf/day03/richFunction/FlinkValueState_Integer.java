@@ -37,6 +37,7 @@ public class FlinkValueState_Integer {
                         }else {
                             acc.update(acc.value()+1);
                         }
+                        //todo 注意:acc需要维护历史累加数据，不清空，后期可以用增量聚合函数替代
                         out.collect("用户:"+ctx.getCurrentKey()+"的pv数据是:"+acc.value());
                     }
                     @Override

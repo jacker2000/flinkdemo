@@ -98,6 +98,7 @@ public class FlinkValueState_Pojo {
                                     (value + tmp.sum) / (tmp.count + 1)
                             );
                             accmulator.update(newAcc);
+                            //todo 注意:accmulator需要维护历史IntegerStatistic数据，不清空
                         }
                         out.collect(accmulator.value());
                     }

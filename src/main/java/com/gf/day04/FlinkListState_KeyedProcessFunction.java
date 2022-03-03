@@ -48,6 +48,7 @@ public class FlinkListState_KeyedProcessFunction {
             for (Integer i : historyData.get()) {
                 integers.add(i);
             }
+            //todo  注意：historyData维护历史数据，不清空，但是会导致historyData越来越大，oom
             //升序排序
             integers.sort(new Comparator<Integer>() {
                 @Override
