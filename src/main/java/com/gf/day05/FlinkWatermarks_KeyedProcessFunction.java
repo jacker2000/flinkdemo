@@ -62,7 +62,7 @@ public class FlinkWatermarks_KeyedProcessFunction {
                     @Override
                     public void onTimer(long timestamp, OnTimerContext ctx, Collector<String> out) throws Exception {
                         super.onTimer(timestamp, ctx, out);
-                        out.collect("定时器触发了，触发的时间是:"+new Timestamp(timestamp));
+                        out.collect("定时器触发了，触发的数据是:"+ctx.getCurrentKey()+"上一个触发的时间是:"+new Timestamp(timestamp));
 
                     }
                 })

@@ -40,6 +40,7 @@ public class FlinkCustom_Watermarks {
                  *     水位线= 观察到最大时间戳-最大延迟时间-1毫秒
                  */
                 .assignTimestampsAndWatermarks(
+                        //最大延迟时间设置5秒钟，水位线的底层实现
                         new WatermarkStrategy<Tuple2<String, Long>>() {
                             @Override
                             public WatermarkGenerator<Tuple2<String, Long>> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
@@ -51,7 +52,7 @@ public class FlinkCustom_Watermarks {
                                     private long maxTx = Long.MIN_VALUE+bound+1L; //防止溢出
                                     @Override
                                     public void onEvent(Tuple2<String, Long> event, long eventTimestamp, WatermarkOutput output) {
-                                        //更新最大时间戳
+                                        //更新最大时间戳，每来一条事件触发一次调用
                                         maxTx=Math.max(maxTx,event.f1);
                                         //手动发送水位线
                                         output.emitWatermark(new Watermark(maxTx-bound-1L));
@@ -94,7 +95,7 @@ public class FlinkCustom_Watermarks {
                 .process(new ProcessWindowFunction<Tuple2<String, Long>, String, String, TimeWindow>() {
                     @Override
                     public void process(String s, Context context, Iterable<Tuple2<String, Long>> elements, Collector<String> out) throws Exception {
-                        out.collect("当前逻辑时钟(水位线)是:"+context.currentWatermark()
+                        out.collect("窗口的key值:"+s+"当前逻辑时钟(水位线)是:"+context.currentWatermark()
                                 +"当前的处理时间为："+new Timestamp(context.currentProcessingTime())
                                 +"窗口"+context.window().getStart()+"~"+context.window().getEnd()
                                 +"数据总数为"+elements.spliterator().getExactSizeIfKnown());

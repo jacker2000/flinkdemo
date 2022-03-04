@@ -47,7 +47,7 @@ public class FlinkTwoStream {
                                 })
                 );
         stream1
-                .union(stream2)
+                .union(stream2)//也是路由，按照先进先出，保存用来保存水位线的数组，所以是两条流
                 .process(new ProcessFunction<Tuple2<String, Long>, String>() {
                     @Override
                     public void processElement(Tuple2<String, Long> value, Context ctx, Collector<String> out) throws Exception {

@@ -1,6 +1,7 @@
 package com.gf.day03.richFunction;
 
 import com.gf.utils.IntegerSource;
+import com.gf.utils.IntegerStatistic;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.Types;
@@ -109,35 +110,5 @@ public class FlinkValueState_Pojo {
         env.execute();
     }
 
-
-    public static class IntegerStatistic{
-        public Integer max;
-        public Integer min;
-        public Integer sum;
-        public Integer count;
-        public Integer avg;
-
-        public IntegerStatistic() {
-        }
-
-        public IntegerStatistic(Integer max, Integer min, Integer sum, Integer count, Integer avg) {
-            this.max = max;
-            this.min = min;
-            this.sum = sum;
-            this.count = count;
-            this.avg = avg;
-        }
-
-        @Override
-        public String toString() {
-            return "IntegerStatistic{" +
-                    "max=" + max +
-                    ", min=" + min +
-                    ", sum=" + sum +
-                    ", count=" + count +
-                    ", avg=" + avg +
-                    '}';
-        }
-    }
 
 }

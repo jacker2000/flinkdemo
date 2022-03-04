@@ -21,6 +21,7 @@ public class FlinkSetWatermarkInterval {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
+        //每隔1分钟插入一次水位线
         env.getConfig().setAutoWatermarkInterval(60*1000L);
                 //a 1,事件时间是1秒,
                 env.socketTextStream("localhost",9999)
@@ -46,14 +47,15 @@ public class FlinkSetWatermarkInterval {
                                 .withTimestampAssigner(new SerializableTimestampAssigner<Tuple2<String, Long>>() {
                                     @Override
                                     public long extractTimestamp(Tuple2<String, Long> element, long recordTimestamp) {
-                                        //告诉flink，f1字段是事件时间戳字段
+                                        //告诉flink，f1字段是事件时间戳字段，指定水位线的时间戳
                                         return element.f1;
                                     }
                                 })
                 )
                 .keyBy(r->r.f0)
-                //事件窗口大小
+                //事件窗口大小，滚动窗口 事件
                 .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+                 //全窗口聚合函数
                 .process(new ProcessWindowFunction<Tuple2<String, Long>, String, String, TimeWindow>() {
                     @Override
                     public void process(String s, Context context, Iterable<Tuple2<String, Long>> elements, Collector<String> out) throws Exception {

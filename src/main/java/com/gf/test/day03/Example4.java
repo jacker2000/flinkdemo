@@ -23,6 +23,7 @@ public class Example4 {
                         return value.f0;
                     }
                 })
+                //key是Tuple2<Integer, Integer>，如果想实现2个tuple2的相加，需要自己实现sum
                 .sum(1)
                 .print();
 

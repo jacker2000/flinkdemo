@@ -10,6 +10,11 @@ import org.apache.flink.util.OutputTag;
 
 import java.sql.Timestamp;
 
+/**
+ *  todo
+ *      迟到数据处理：
+ *
+ */
 public class FlinkLateData {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();

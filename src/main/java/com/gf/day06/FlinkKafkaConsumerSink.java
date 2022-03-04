@@ -32,8 +32,8 @@ import java.util.Properties;
  * 实时热门商品
  * 每隔5分钟计算一次过去一小时的pv最多的3个商品
  * read from kafka
- *  todo 启动先后顺序
- *    先启动消费者-->再启动生产者
+ * todo 启动先后顺序
+ * 先启动消费者-->再启动生产者
  */
 public class FlinkKafkaConsumerSink {
     public static void main(String[] args) throws Exception {
@@ -44,8 +44,8 @@ public class FlinkKafkaConsumerSink {
         properties.setProperty("bootstrap.servers", "hadoop102:9092,hadoop103:9092,hadoop104:9092");
         properties.setProperty("group.id", "consumer-group");
 
-        properties.setProperty("key.deserializer",  "org.apache.kafka.common.serialization.StringDeserializer");
-        properties.setProperty("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
+        properties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        properties.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         properties.setProperty("auto.offset.reset", "latest");
 
         SingleOutputStreamOperator<UserBehavior> stream = env.addSource(new FlinkKafkaConsumer<String>(
@@ -63,7 +63,7 @@ public class FlinkKafkaConsumerSink {
                                 arr[1],
                                 arr[2],
                                 arr[3],
-                                Long.parseLong(arr[4])
+                                Long.parseLong(arr[4]) * 1000L
                         );
                     }
                 })
@@ -104,7 +104,8 @@ public class FlinkKafkaConsumerSink {
         private ListState<ItemViewCountPerWindow> listState;
 
         //定义要注册的初始事件时间
-        private ValueState<Long> timeTs ;
+        private ValueState<Long> timeTs;
+
         @Override
         public void open(Configuration parameters) throws Exception {
             super.open(parameters);
@@ -114,8 +115,8 @@ public class FlinkKafkaConsumerSink {
                             Types.POJO(ItemViewCountPerWindow.class)
                     )
             );
-            timeTs= getRuntimeContext().getState(
-                    new ValueStateDescriptor<Long>("time_end",Types.LONG)
+            timeTs = getRuntimeContext().getState(
+                    new ValueStateDescriptor<Long>("time_end", Types.LONG)
             );
         }
 
@@ -131,7 +132,7 @@ public class FlinkKafkaConsumerSink {
              *   当大于等于value.windowEndTime +100L的水位线到达KeyedProcessFunction以后
              *   value.windowEndTime 所标识的窗口中的所有统计信息都已到达
              */
-            ctx.timerService().registerEventTimeTimer(value.windowEndTime+100L);
+            ctx.timerService().registerEventTimeTimer(value.windowEndTime + 100L);
 
         }
 
@@ -150,19 +151,27 @@ public class FlinkKafkaConsumerSink {
                 @Override
                 public int compare(ItemViewCountPerWindow o1, ItemViewCountPerWindow o2) {
                     //记住是降序排序
-                    return  o2.count.intValue()-o1.count.intValue();
+                    return o2.count.intValue() - o1.count.intValue();
                 }
             });
             //格式化输出
             StringBuilder result = new StringBuilder();
             result.append("======================\n");
-            result.append("窗口结束时间"+new Timestamp(timestamp-100L)+"\n ");
-            for (int i = 0; i < n; i++) {
-                ItemViewCountPerWindow itemViewCountPerWindow = list.get(i);
-                result.append("第"+(i+1)+"商品ID是"+itemViewCountPerWindow.itemId+"浏览次数是:"+itemViewCountPerWindow.count+"\n");
+            result.append("窗口结束时间" + new Timestamp(timestamp - 100L) + "\n ");
+
+            if (list.size() >= 3) {
+                for (int i = 0; i < n; i++) {
+                    ItemViewCountPerWindow itemViewCountPerWindow = list.get(i);
+                    result.append("第" + (i+1) + "名的商品ID是：" + itemViewCountPerWindow.itemId + "，浏览次数是：" + itemViewCountPerWindow.count + "\n");
+                }
+            }else {
+                for (int i = 0; i < list.size(); i++) {
+                    ItemViewCountPerWindow itemViewCountPerWindow = list.get(i);
+                    result.append("第" + (i+1) + "名的商品ID是：" + itemViewCountPerWindow.itemId + "，浏览次数是：" + itemViewCountPerWindow.count + "\n");
+                }
             }
             result.append("=============================\n");
-            out.collect(result.toString());
+            out.collect(result.toString() + "当前水位线数值为" + timestamp + "当前窗口的水位线时间戳是:" + new Timestamp(timestamp));
 
         }
     }

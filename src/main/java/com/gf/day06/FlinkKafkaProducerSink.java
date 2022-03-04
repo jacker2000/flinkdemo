@@ -7,6 +7,10 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import java.util.Properties;
 
 //sink  to kafka
+
+/**
+ *  重复发送相同事件时间的，相同节点数据，后面是无法接收的，因为窗口已经关闭了
+ */
 public class FlinkKafkaProducerSink {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
