@@ -10,7 +10,7 @@ import org.apache.flink.util.Collector;
 /**
  * 实现流的
  */
-public class Example1 {
+public class FlinkTwoQueryStream {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);

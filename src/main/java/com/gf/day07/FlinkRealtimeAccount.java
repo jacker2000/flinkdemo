@@ -14,7 +14,7 @@ import org.apache.flink.util.Collector;
 
 //实时对账
 // app的支付信息和第三方支付信息的对账
-public class Example3 {
+public class FlinkRealtimeAccount {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
@@ -25,12 +25,12 @@ public class Example3 {
                     public void run(SourceContext<OrderEvent> ctx) throws Exception {
                         OrderEvent e1 = new OrderEvent("order-1", "app-zhifu", 1000L);
                         ctx.collectWithTimestamp(e1, e1.ts);
-                        Thread.sleep(1000L);
+                        Thread.sleep(3000L);
                         OrderEvent e2 = new OrderEvent("order-2", "app-zhifu", 2000L);
                         ctx.collectWithTimestamp(e2, e2.ts);
-                        Thread.sleep(1000L);
+                        Thread.sleep(3000L);
                         ctx.emitWatermark(new Watermark(7000L));
-                        Thread.sleep(1000L);
+                        Thread.sleep(3000L);
                     }
                     @Override
                     public void cancel() {
@@ -41,14 +41,14 @@ public class Example3 {
                 .addSource(new SourceFunction<OrderEvent>() {
                     @Override
                     public void run(SourceContext<OrderEvent> ctx) throws Exception {
-                        OrderEvent e1 = new OrderEvent("order-1", "weixin-zhifu", 4000L);
+                        OrderEvent e1 = new OrderEvent("order-1", "weixin-zhifu", 3000L);
                         ctx.collectWithTimestamp(e1, e1.ts);
                         Thread.sleep(1000L);
 
                         ctx.emitWatermark(new Watermark(7000L));
                         Thread.sleep(1000L);
 
-                        OrderEvent e2 = new OrderEvent("order-2", "weixin-zhifu", 9000L);
+                        OrderEvent e2 = new OrderEvent("order-2", "weixin-zhifu", 12000L);
                         ctx.collectWithTimestamp(e2, e2.ts);
                         Thread.sleep(1000L);
                     }

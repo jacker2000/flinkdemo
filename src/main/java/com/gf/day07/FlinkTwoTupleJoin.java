@@ -13,7 +13,7 @@ import org.apache.flink.util.Collector;
 
 //CoProcessFunction
 // select * from A inner join B on A.id=B.id;
-public class Example2<T extends Tuple, T1 extends Tuple, S> {
+public class FlinkTwoTupleJoin<T extends Tuple, T1 extends Tuple, S> {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);

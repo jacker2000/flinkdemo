@@ -15,7 +15,7 @@ import org.apache.flink.util.Collector;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Example6 {
+public class FlinkCustom_SlidingWindow {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);

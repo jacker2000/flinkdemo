@@ -12,7 +12,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 /**
  * 基于窗口的join
  */
-public class Example5 {
+public class FlinkTwoWindowJoin {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
