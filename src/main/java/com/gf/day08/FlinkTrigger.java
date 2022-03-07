@@ -19,7 +19,7 @@ import org.apache.flink.util.Collector;
 
 import java.sql.Timestamp;
 
-public class Example1 {
+public class FlinkTrigger {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);

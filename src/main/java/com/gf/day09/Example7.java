@@ -82,11 +82,11 @@ public class Example7 {
 
         String innerSql ="select itemId,COUNT(itemId) as cnt," +
                 "HOP_START(ts,INTERVAL '5' MINUTES,INTERVAL '1' HOURS) as windowStartTime," +
-                "HOP_END(ts,INTERVAL '5' MINUTES,INTERVAL '1' HOURS) as windowEndTime" +
+                "HOP_END(ts,INTERVAL '5' MINUTES,INTERVAL '1' HOURS) as windowEndTime " +
                 "FROM userbehavior GROUP BY itemId,HOP(ts,INTERVAL '5' MINUTES,INTERVAL '1' HOURS)";
 
         //按照窗口结束时间分区，然后按照浏览量降序排列
-        String minSql ="SELECT * ,ROW_NUMBER() OVER(PARTITION BY windowEndTime ORDER BY cnt DESC) as row_num"+
+        String minSql ="SELECT * ,ROW_NUMBER() OVER(PARTITION BY windowEndTime ORDER BY cnt DESC) as row_num "+
                 "FROM("+innerSql+")";
         String outerSql ="SELECT * FROM ("+minSql+") where row_num<=3";
         Table result = streamTableEnvironment.sqlQuery(outerSql);

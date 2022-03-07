@@ -23,7 +23,7 @@ import java.util.HashSet;
  *  每小时UV统计
  *  uv是pv按照userID进行去重后的结果
  */
-public class Example4 {
+public class FlinkDistinctStatisticsUV {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
@@ -64,7 +64,6 @@ public class Example4 {
     //输入，统计，输出
     public static class CoutAgg implements AggregateFunction<UserBehavior, HashSet<String>, Long> {
 
-
         @Override
         public HashSet<String> createAccumulator() {
             return new HashSet<>();
@@ -94,15 +93,5 @@ public class Example4 {
                     +new Timestamp(context.window().getEnd())+"中的UV是:"+elements.iterator().next());
         }
 
-//        @Override
-//        public void process(String s, Context context, Iterable<Long> elements, Collector<ItemViewCountPerWindow> out) throws Exception {
-//
-//            out.collect(new ItemViewCountPerWindow(
-//                    s,
-//                    elements.iterator().next(),
-//                    context.window().getStart(),
-//                    context.window().getEnd()
-//            ));
-//        }
     }
 }

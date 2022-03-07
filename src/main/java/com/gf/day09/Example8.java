@@ -23,6 +23,6 @@ public class Example8 {
 // 在输出表上进行查询，查询结果写入输出表
         streamTableEnvironment
                 .executeSql("INSERT INTO ResultTable SELECT user, COUNT(url) as cnt FROM clicks GROUP BY user");
-        env.execute();
+        //默认Executor
     }
 }
